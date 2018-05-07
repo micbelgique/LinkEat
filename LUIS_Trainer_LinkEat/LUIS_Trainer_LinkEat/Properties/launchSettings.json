@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "LUIS_Trainer_LinkEat": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "LUIS__SubscriptionKey": "a6b1da1445e44a04bcebd8038f639d69",
+        "LUIS__AppId": "6b939b23-0ad9-4ede-a56c-2dbc8dc5dce7",
+        "ConnectionStrings__DefaultConnection": "Server=tcp:techoffice-prod.database.windows.net,1433;Initial Catalog=linkeat;Persist Security Info=False;User ID=linkeat;Password=#lOs*bA!Mn5q;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+      }
+    }
+  }
+}

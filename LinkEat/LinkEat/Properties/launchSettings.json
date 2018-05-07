@@ -1,0 +1,38 @@
+{
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:16806/",
+      "sslPort": 0
+    }
+  },
+  "profiles": {
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "api/messages",
+      "environmentVariables": {
+        "Slack__Token": "xoxp-354863789041-356458145863-356501342065-7b6a541ecf8a93ee8d5df259899cd633",
+        "BotConnectionInfo__AppId": "",
+        "BotConnectionInfo__AppPassword": "",
+        "Twilio__AccountSID": "ACb0d53cb0d809bdc624c5a6627219e852",
+        "Twilio__Phone": "+3243207118",
+        "LUIS__SubscriptionKey": "8e7a90cb408e4ffda5658a3a596a2626",
+        "LUIS__AppId": "6b939b23-0ad9-4ede-a56c-2dbc8dc5dce7",
+        "ConnectionStrings__DefaultConnection": "Server=tcp:techoffice-prod.database.windows.net,1433;Initial Catalog=linkeat;Persist Security Info=False;User ID=linkeat;Password=#lOs*bA!Mn5q;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "Twilio__AuthToken": "462aedbfb90f7ec73bbc59ccd830d077"
+      }
+    },
+    "Bot_LinkEat": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "api/messages",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:16807/"
+    }
+  }
+}
