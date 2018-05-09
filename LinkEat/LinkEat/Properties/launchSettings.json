@@ -14,8 +14,6 @@
       "launchUrl": "api/messages",
       "environmentVariables": {
         "Slack__Token": "xoxp-354863789041-356458145863-356501342065-7b6a541ecf8a93ee8d5df259899cd633",
-        "BotConnectionInfo__AppId": "",
-        "BotConnectionInfo__AppPassword": "",
         "Twilio__AccountSID": "ACb0d53cb0d809bdc624c5a6627219e852",
         "Twilio__Phone": "+3243207118",
         "LUIS__SubscriptionKey": "8e7a90cb408e4ffda5658a3a596a2626",

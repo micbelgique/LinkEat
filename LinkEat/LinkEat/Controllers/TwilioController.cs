@@ -47,7 +47,7 @@ namespace LinkEat.Controllers
         {
             List<XElement> todaysOrder = new List<XElement>
             {
-                new XElement("Gather", new XAttribute("action", "http://linkeattest.azurewebsites.net/api/twilio/"), new XAttribute("timeout", "60"), new XAttribute("numDigits", "1"), new XElement("Say",
+                new XElement("Gather", new XAttribute("action", "https://linkeat.azurewebsites.net/api/twilio/"), new XAttribute("timeout", "60"), new XAttribute("numDigits", "1"), new XElement("Say",
                 new XAttribute("language", "fr-FR"),
                 new XAttribute("voice", "Alice"),
                 "Bonjour, j'appelle pour la commande du MIC."
@@ -73,24 +73,24 @@ namespace LinkEat.Controllers
             return xmlDocument;
         }
 
-        //[HttpPut] 
-        //public async System.Threading.Tasks.Task Put() 
-        //{ 
-        //    /* Twilio config for calling */
-        //    Place place = await _placeRepository.GetById(1);
+        [HttpPut]
+        public async System.Threading.Tasks.Task Put()
+        {
+            /* Twilio config for calling */
+            Place place = await _placeRepository.GetById(1);
 
-        //    PhoneNumber to = new PhoneNumber(place.Phone);
-        //    PhoneNumber from = new PhoneNumber(_phone);
-        //    CallResource call = CallResource.Create(to, from,
-        //        url: new Uri("http://linkeattest.azurewebsites.net/api/twilio/"),
-        //        method: Twilio.Http.HttpMethod.Get);
-        //}
+            PhoneNumber to = new PhoneNumber(place.Phone);
+            PhoneNumber from = new PhoneNumber(_phone);
+            CallResource call = CallResource.Create(to, from,
+                url: new Uri("https://linkeat.azurewebsites.net/api/twilio/"),
+                method: Twilio.Http.HttpMethod.Get);
+        }
 
         [HttpPost] 
         public async Task<TwiMLResult> Post() 
         { 
             var response = new VoiceResponse();
-            var gather = new Gather(timeout: 3, numDigits: 1, action: new Uri("http://linkeattest.azurewebsites.net/api/twilio/"));
+            var gather = new Gather(timeout: 3, numDigits: 1, action: new Uri("https://linkeat.azurewebsites.net/api/twilio/"));
 
             List<Meal> meals = await _mealRepository.GetAllAsync();
             foreach (var meal in meals)

@@ -38,17 +38,24 @@ namespace LinkEat.Services
             DbContextOptionsBuilder<AppDbContext> options = new DbContextOptionsBuilder<AppDbContext>();
             options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection"));
 
+            PlaceRepository placeRepository;
+            AppointmentRepository appointmentRepository;
+            UserRepository userRepository;
+            DateTime currentTime;
+
+            List<Appointment> appointments;
+
             while (true)
             {
                 using(AppDbContext appDbContext = new AppDbContext(options.Options))
                 {
-                    PlaceRepository placeRepository = new PlaceRepository(appDbContext);
-                    AppointmentRepository appointmentRepository = new AppointmentRepository(appDbContext);
-                    UserRepository userRepository = new UserRepository(appDbContext);
+                    placeRepository = new PlaceRepository(appDbContext);
+                    appointmentRepository = new AppointmentRepository(appDbContext);
+                    userRepository = new UserRepository(appDbContext);
 
-                    DateTime currentTime = DateTime.Now;
+                    currentTime = DateTime.Now;
 
-                    List<Appointment> appointments = await appointmentRepository.GetByDateAsync(currentTime);
+                    appointments = await appointmentRepository.GetByDateAsync(currentTime);
                     foreach (var appointment in appointments)
                     {
                         AppointmentReminder(appointment, currentTime, appointments, placeRepository, userRepository);
@@ -88,11 +95,11 @@ namespace LinkEat.Services
                         reminder = new SlackReminder
                         {
                             user = user.SlackId,
-                            text = "N'oubliez pas que vous vous êtes inscrit pour " + place.Name + " dont le départ à lieu à " + appointment.Date.Hour + "h" + ((appointment.Date.Minute == 0)? "0" : appointment.Date.Minute.ToString()),
+                            text = "N'oubliez pas que vous vous êtes inscrit pour " + place.Name + " dont le départ à lieu à " + appointment.Date.Hour + "h" + ((appointment.Date.Minute == 0)? "" : appointment.Date.Minute.ToString()),
                             time = 15
                         };
                     }else{
-                        string message = "N'oubliez pas que vous vous êtes inscrit pour " + place.Name + " dont le départ à lieu à " + appointment.Date.Hour + "h" + ((appointment.Date.Minute == 0)? "0" : appointment.Date.Minute.ToString());
+                        string message = "N'oubliez pas que vous vous êtes inscrit pour " + place.Name + " dont le départ à lieu à " + appointment.Date.Hour + "h" + ((appointment.Date.Minute == 0)? "" : appointment.Date.Minute.ToString());
 
                         List<Appointment> samePlaceAppointments = appointments.FindAll(a => a.PlaceId == appointment.PlaceId);
                         int count = 0;
@@ -115,7 +122,7 @@ namespace LinkEat.Services
 
                         if (count >= 1)
                         {
-                            message += "\nCependant, vous êtes la seule personne à avoir choisi ce créneau horaire. Je vous propose donc d'aller à ce même restaurant, mais à " + date.Hour + "h" + ((date.Minute == 0)? "0" : date.Minute.ToString());
+                            message += "\nCependant, vous êtes la seule personne à avoir choisi ce créneau horaire. Je vous propose donc d'aller à ce même restaurant, mais à " + date.Hour + "h" + ((date.Minute == 0)? "" : date.Minute.ToString());
                         }else{
                             List<Appointment> sameTimeAppointments = appointments.FindAll(a => a.Date.Hour == appointment.Date.Hour && a.Date.Minute == appointment.Date.Minute);
                             int countPeople = 0;
@@ -139,7 +146,7 @@ namespace LinkEat.Services
                             if (countPeople >= 1)
                             {
                                 Place newPlace = await placeRepository.GetById(placeId);
-                                message += "\nCependant, vous êtes la seule personne à avoir choisi ce créneau horaire. Je vous propose donc d'aller au " + newPlace.Name + " à " + appointment.Date.Hour + "h" + ((appointment.Date.Minute == 0)? "0" : appointment.Date.Minute.ToString());
+                                message += "\nCependant, vous êtes la seule personne à avoir choisi ce créneau horaire. Je vous propose donc d'aller au " + newPlace.Name + " à " + appointment.Date.Hour + "h" + ((appointment.Date.Minute == 0)? "" : appointment.Date.Minute.ToString());
                             }else{
                                 countPeople = 0;
                                 placeId = 1;
@@ -172,7 +179,7 @@ namespace LinkEat.Services
                                 if (countPeople >= 1)
                                 {
                                     Place newPlace = await placeRepository.GetById(placeId);
-                                    message += "\nCependant, vous êtes la seule personne à avoir choisi ce créneau horaire. Je vous propose donc d'aller au " + newPlace.Name + " à " + newDate.Hour + "h" + ((newDate.Minute == 0)? "0" : newDate.Minute.ToString());
+                                    message += "\nCependant, vous êtes la seule personne à avoir choisi ce créneau horaire. Je vous propose donc d'aller au " + newPlace.Name + " à " + newDate.Hour + "h" + ((newDate.Minute == 0)? "" : newDate.Minute.ToString());
                                 }else
                                 {
                                     message += "\nMalheureusement je n'ai pas de regroupement alternatif à vous proposer aujourd'hui.";
@@ -226,7 +233,7 @@ namespace LinkEat.Services
             PhoneNumber to = new PhoneNumber(place.Phone);
             PhoneNumber from = new PhoneNumber(_phone);
             CallResource call = CallResource.Create(to, from,
-                url: new Uri("http://linkeattest.azurewebsites.net/api/twilio/"),
+                url: new Uri("https://linkeat.azurewebsites.net/api/twilio/"),
                 method: Twilio.Http.HttpMethod.Get);
         }
 
