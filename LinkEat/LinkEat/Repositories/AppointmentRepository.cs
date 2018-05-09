@@ -42,6 +42,8 @@ namespace LinkEat.Repositories
         {
             //Day, month, year +  Hour, minutes
             Appointment correspondingAppointment = await dbContext.Appointments.FirstOrDefaultAsync(appointment => this.SameDate(appointment.Date, date) && appointment.UserId == id);
+            if (correspondingAppointment == null) throw new Exception("Impossible to find that appointment !");
+
             //We're searching for appointments that are corresponding with the date that has been sent
             return correspondingAppointment;
         }
@@ -57,6 +59,8 @@ namespace LinkEat.Repositories
         public async Task<Appointment> GetByUser(int id)
         {
             var correspondingAppointment = await dbContext.Appointments.FirstOrDefaultAsync(appointment => appointment.UserId == id);
+            if (correspondingAppointment == null) throw new Exception("Impossible to find that appointment !");
+
             return correspondingAppointment;
         }
 
