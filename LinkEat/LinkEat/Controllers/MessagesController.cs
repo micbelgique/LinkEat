@@ -63,9 +63,19 @@ namespace LinkEat.Controllers
                 JObject datas = (JObject)activity.ChannelData;
                 string datasStringified = datas.ToString();
 
-                int userTokenStartingPoint = datasStringified.IndexOf("user") + datasStringified.Substring(datasStringified.IndexOf("user")).IndexOf(":");
-                int userTokenFirstChar = userTokenStartingPoint + datasStringified.Substring(userTokenStartingPoint).IndexOf('"') + 1;
-                string userToken = datasStringified.Substring(userTokenFirstChar).Substring(0, datasStringified.Substring(userTokenFirstChar).IndexOf('"'));
+                string userToken;
+
+                if (datasStringified.Contains("user"))
+                {
+                    int userTokenStartingPoint = datasStringified.IndexOf("user") + datasStringified.Substring(datasStringified.IndexOf("user")).IndexOf(":");
+                    int userTokenFirstChar = userTokenStartingPoint + datasStringified.Substring(userTokenStartingPoint).IndexOf('"') + 1;
+                    userToken = datasStringified.Substring(userTokenFirstChar).Substring(0, datasStringified.Substring(userTokenFirstChar).IndexOf('"'));
+                }
+                else
+                {
+                    //For outer slack testing
+                    userToken = "SAMPLE";
+                }
 
                 string botReply;
 
@@ -229,57 +239,69 @@ namespace LinkEat.Controllers
                             var requestResponse = await client.PostAsync( "https://slack.com/api/users.profile.get", stringContent);
                             var userInfos = await requestResponse.Content.ReadAsAsync<ProfileDeserializerModel>();
 
-
-                            if(userInfos.profile.first_name != null && userInfos.profile.first_name != null && userInfos.profile.first_name.Length > 0 && userInfos.profile.last_name.Length > 0)
+                            if(userInfos != null && userInfos.profile != null)
                             {
-                                user = await _userRepository.Create(new User
-                                {
-                                    FirstName = userInfos.profile.first_name,
-                                    LastName = userInfos.profile.last_name,
-                                    Email = userInfos.profile.email,
-                                    SlackId = userToken
-                                });
-                            }
-                            else if(userInfos.profile.display_name_normalized != null && userInfos.profile.display_name_normalized.Length > 0)
-                            {
-                                if(userInfos.profile.display_name_normalized.Contains(" "))
+                                if(userInfos.profile.first_name != null && userInfos.profile.first_name != null && userInfos.profile.first_name.Length > 0 && userInfos.profile.last_name.Length > 0)
                                 {
                                     user = await _userRepository.Create(new User
                                     {
-                                        FirstName = userInfos.profile.display_name_normalized.Split(" ")[0],
-                                        LastName = userInfos.profile.display_name_normalized.Split(" ")[1],
+                                        FirstName = userInfos.profile.first_name,
+                                        LastName = userInfos.profile.last_name,
                                         Email = userInfos.profile.email,
                                         SlackId = userToken
                                     });
+                                }
+                                else if(userInfos.profile.display_name_normalized != null && userInfos.profile.display_name_normalized.Length > 0)
+                                {
+                                    if(userInfos.profile.display_name_normalized.Contains(" "))
+                                    {
+                                        user = await _userRepository.Create(new User
+                                        {
+                                            FirstName = userInfos.profile.display_name_normalized.Split(" ")[0],
+                                            LastName = userInfos.profile.display_name_normalized.Split(" ")[1],
+                                            Email = userInfos.profile.email,
+                                            SlackId = userToken
+                                        });
+                                    }
+                                    else
+                                    {
+                                        user = await _userRepository.Create(new User
+                                        {
+                                            FirstName = userInfos.profile.display_name_normalized,
+                                            LastName = "",
+                                            Email = userInfos.profile.email,
+                                            SlackId = userToken
+                                        });
+                                    }
+                                }     
+                                else if(userInfos.profile.real_name_normalized != null && userInfos.profile.real_name_normalized.Length > 0)
+                                {
+                                    if(userInfos.profile.real_name_normalized.Contains(" "))
+                                    {
+                                        user = await _userRepository.Create(new User
+                                        {
+                                            FirstName = userInfos.profile.real_name_normalized.Split(" ")[0],
+                                            LastName = userInfos.profile.real_name_normalized.Split(" ")[1],
+                                            Email = userInfos.profile.email,
+                                            SlackId = userToken
+                                        });
+                                    }
+                                    else
+                                    {
+                                        user = await _userRepository.Create(new User
+                                        {
+                                            FirstName = userInfos.profile.real_name_normalized,
+                                            LastName = "",
+                                            Email = userInfos.profile.email,
+                                            SlackId = userToken
+                                        });
+                                    }
                                 }
                                 else
                                 {
                                     user = await _userRepository.Create(new User
                                     {
-                                        FirstName = userInfos.profile.display_name_normalized,
-                                        LastName = "",
-                                        Email = userInfos.profile.email,
-                                        SlackId = userToken
-                                    });
-                                }
-                            }     
-                            else if(userInfos.profile.real_name_normalized != null && userInfos.profile.real_name_normalized.Length > 0)
-                            {
-                                if(userInfos.profile.real_name_normalized.Contains(" "))
-                                {
-                                    user = await _userRepository.Create(new User
-                                    {
-                                        FirstName = userInfos.profile.real_name_normalized.Split(" ")[0],
-                                        LastName = userInfos.profile.real_name_normalized.Split(" ")[1],
-                                        Email = userInfos.profile.email,
-                                        SlackId = userToken
-                                    });
-                                }
-                                else
-                                {
-                                    user = await _userRepository.Create(new User
-                                    {
-                                        FirstName = userInfos.profile.real_name_normalized,
+                                        FirstName = "",
                                         LastName = "",
                                         Email = userInfos.profile.email,
                                         SlackId = userToken
@@ -288,12 +310,13 @@ namespace LinkEat.Controllers
                             }
                             else
                             {
-                                user = await _userRepository.Create(new User
+                                user = await _userRepository.Create(new Models.User
                                 {
+
                                     FirstName = "",
                                     LastName = "",
-                                    Email = userInfos.profile.email,
-                                    SlackId = userToken
+                                    Email = "",
+                                    SlackId = ""
                                 });
                             }
                         }
@@ -308,7 +331,7 @@ namespace LinkEat.Controllers
                         }else{
                             botReply = "Désolé je n'ai pas compris.. Pouvez-vous répéter différemment?";
                         }
-                        };
+                    };
                 }
 
                 var reply = activity.CreateReply(botReply);
