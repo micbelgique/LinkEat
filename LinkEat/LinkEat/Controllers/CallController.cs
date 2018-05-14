@@ -19,8 +19,8 @@ using Twilio.Types;
 
 namespace LinkEat.Controllers
 {
-    [Route("api/twilio")]
-    public class TwilioController : Twilio.AspNet.Core.TwilioController
+    [Route("api/call")]
+    public class CallController : TwilioController
     {
         private readonly IConfiguration _config;
         private readonly string _token;
@@ -30,7 +30,7 @@ namespace LinkEat.Controllers
         private readonly MealRepository _mealRepository;
         private readonly PlaceRepository _placeRepository;
 
-        public TwilioController(IConfiguration configuration, OrderRepository orderRepository, MealRepository mealRepository, PlaceRepository placeRepository)
+        public CallController(IConfiguration configuration, OrderRepository orderRepository, MealRepository mealRepository, PlaceRepository placeRepository)
         {
             _config = configuration;
             _token = configuration["Slack:Token"];
@@ -47,7 +47,7 @@ namespace LinkEat.Controllers
         {
             List<XElement> todaysOrder = new List<XElement>
             {
-                new XElement("Gather", new XAttribute("action", "https://linkeat.azurewebsites.net/api/twilio/"), new XAttribute("timeout", "60"), new XAttribute("numDigits", "1"), new XElement("Say",
+                new XElement("Gather", new XAttribute("action", "https://linkeat.azurewebsites.net/api/call"), new XAttribute("timeout", "60"), new XAttribute("numDigits", "1"), new XElement("Say",
                 new XAttribute("language", "fr-FR"),
                 new XAttribute("voice", "Alice"),
                 "Bonjour, j'appelle pour la commande du MIC."
@@ -74,7 +74,7 @@ namespace LinkEat.Controllers
         }
 
         [HttpPut]
-        public async System.Threading.Tasks.Task Put()
+        public async Task<OkResult> Put()
         {
             /* Twilio config for calling */
             Place place = await _placeRepository.GetById(1);
@@ -82,15 +82,17 @@ namespace LinkEat.Controllers
             PhoneNumber to = new PhoneNumber(place.Phone);
             PhoneNumber from = new PhoneNumber(_phone);
             CallResource call = CallResource.Create(to, from,
-                url: new Uri("https://linkeat.azurewebsites.net/api/twilio/"),
+                url: new Uri("https://linkeat.azurewebsites.net/api/call"),
                 method: Twilio.Http.HttpMethod.Get);
+
+            return Ok();
         }
 
         [HttpPost] 
         public async Task<TwiMLResult> Post() 
         { 
             var response = new VoiceResponse();
-            var gather = new Gather(timeout: 3, numDigits: 1, action: new Uri("https://linkeat.azurewebsites.net/api/twilio/"));
+            var gather = new Gather(timeout: 3, numDigits: 1, action: new Uri("https://linkeat.azurewebsites.net/api/call"));
 
             List<Meal> meals = await _mealRepository.GetAllAsync();
             foreach (var meal in meals)

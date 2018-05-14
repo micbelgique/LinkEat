@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Twilio;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 
 namespace LinkEat
 {
@@ -78,6 +79,8 @@ namespace LinkEat
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
                 app.UseBrowserLink();
+            } else {
+                app.UseHttpsRedirection();
             }
 
             app.UseStaticFiles();
