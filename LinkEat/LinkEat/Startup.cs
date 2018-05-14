@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Twilio;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 
 namespace LinkEat
 {
@@ -43,13 +44,7 @@ namespace LinkEat
 
             var credentialProvider = new SimpleCredentialProvider(Configuration["BotConnectionInfo:AppId"], Configuration["BotConnectionInfo:AppPassword"]);
 
-            services.AddAuthentication(
-                    options =>
-                    {
-                        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                    }
-                )
+            services.AddAuthentication()
                 .AddBotAuthentication(credentialProvider);
 
             services.AddSingleton(typeof(ICredentialProvider), credentialProvider);
@@ -78,6 +73,8 @@ namespace LinkEat
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
                 app.UseBrowserLink();
+            } else {
+                app.UseHttpsRedirection();
             }
 
             app.UseStaticFiles();

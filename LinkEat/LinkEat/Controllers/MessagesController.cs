@@ -48,7 +48,7 @@ namespace LinkEat.Controllers
             _userRepository = userRepository;
         }
 
-        [Authorize(Roles = "Bot")]
+        //[Authorize(Roles = "Bot")]
         [HttpPost]
         public async Task<OkResult> Post([FromBody] Activity activity)
         {
@@ -228,15 +228,16 @@ namespace LinkEat.Controllers
                         {
                             user = await _userRepository.GetBySlackId(userToken);
                         }catch (Exception){
-                            Object request = new 
-                            {
-                                token = _slackToken,
-                                user = userToken
-                            };
+                            var content = new FormUrlEncodedContent(new KeyValuePair<string, string>[]{
+                                new KeyValuePair<string, string>("token", _slackToken),
+                                new KeyValuePair<string, string>("user", userToken),
+                            });
 
-                            var stringContent = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
+                            content.Headers.Clear();
+                            content.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
+
                             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _slackToken);
-                            var requestResponse = await client.PostAsync( "https://slack.com/api/users.profile.get", stringContent);
+                            var requestResponse = await client.PostAsync( "https://slack.com/api/users.profile.get", content);
                             var userInfos = await requestResponse.Content.ReadAsAsync<ProfileDeserializerModel>();
 
                             if(userInfos != null && userInfos.profile != null)
@@ -407,6 +408,7 @@ namespace LinkEat.Controllers
                     {
                         if(dishToOrder.EndsWith("s")) dishToOrder = dishToOrder.Substring(0, dishToOrder.Length - 1);
                         dishToOrder = dishToOrder.Replace("sandwich", ""); 
+                        dishToOrder = "sandwich " + dishToOrder;
 
                         if (mealId > 0)
                         {

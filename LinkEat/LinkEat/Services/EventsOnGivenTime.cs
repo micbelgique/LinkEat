@@ -233,7 +233,7 @@ namespace LinkEat.Services
             PhoneNumber to = new PhoneNumber(place.Phone);
             PhoneNumber from = new PhoneNumber(_phone);
             CallResource call = CallResource.Create(to, from,
-                url: new Uri("https://linkeat.azurewebsites.net/api/twilio/"),
+                url: new Uri("https://linkeat.azurewebsites.net/api/call"),
                 method: Twilio.Http.HttpMethod.Get);
         }
 
