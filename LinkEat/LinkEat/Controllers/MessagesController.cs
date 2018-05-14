@@ -48,7 +48,7 @@ namespace LinkEat.Controllers
             _userRepository = userRepository;
         }
 
-        [Authorize(Roles = "Bot")]
+        //[Authorize(Roles = "Bot")]
         [HttpPost]
         public async Task<OkResult> Post([FromBody] Activity activity)
         {

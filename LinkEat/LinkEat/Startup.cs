@@ -44,13 +44,7 @@ namespace LinkEat
 
             var credentialProvider = new SimpleCredentialProvider(Configuration["BotConnectionInfo:AppId"], Configuration["BotConnectionInfo:AppPassword"]);
 
-            services.AddAuthentication(
-                    options =>
-                    {
-                        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                    }
-                )
+            services.AddAuthentication()
                 .AddBotAuthentication(credentialProvider);
 
             services.AddSingleton(typeof(ICredentialProvider), credentialProvider);
